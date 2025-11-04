@@ -9,8 +9,7 @@ Rails.application.routes.draw do
       post "auth/logout", to: "auth#logout"
       post "auth/password/reset", to: "auth#password_reset"
 
-      resources :users, only: [ :index, :show, :update, :destroy ] do
-      end
+      resources :users, only: [ :index, :show, :update, :destroy ]
 
       resources :tasks do
         resources :comments, only: [ :index, :create ], shallow: true
@@ -31,24 +30,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
-      resources :tasks, only: [ :index, :show, :update, :destroy ] do
-      end
-    end
-  end
-
-  concern :commentable do
-    resources :comments, only: [ :index, :create, :destroy ], shallow: true
-  end
-
-  concern :assignable do
-    member do
-      post :assign
-    end
-  end
-
-  concern :completable do
-    member do
-      post :complete
+      resources :tasks, only: [ :index, :show, :update, :destroy ]
     end
   end
 
