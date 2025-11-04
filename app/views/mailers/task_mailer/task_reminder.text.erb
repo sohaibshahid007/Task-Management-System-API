@@ -1,0 +1,21 @@
+Task Reminder - Overdue
+
+Hello <%= @assignee.full_name %>,
+
+This is a reminder that you have an overdue task:
+
+Title: <%= @task.title %>
+<% if @task.description.present? %>
+Description: <%= @task.description %>
+<% end %>
+Priority: <%= @task.priority.humanize %>
+<% if @task.due_date.present? %>
+Due Date: <%= @task.due_date.strftime("%B %d, %Y") %>
+Days Overdue: <%= ((Time.current - @task.due_date) / 1.day).round %>
+<% end %>
+
+Please complete this task as soon as possible.
+
+Best regards,
+Task Manager Team
+

@@ -50,21 +50,74 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Email configuration for production
+  # Enable email delivery errors to catch issues early
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.perform_caching = false
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # Set host to be used by links generated in mailer templates
+  # Update this with your actual domain
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("MAILER_HOST", "example.com"),
+    protocol: "https"
+  }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Configure SMTP delivery method for production
+  # Use environment variables or Rails credentials for sensitive data
+  config.action_mailer.delivery_method = :smtp
+  
+  config.action_mailer.smtp_settings = {
+    # SMTP server address (common providers listed below)
+    address: ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
+    port: ENV.fetch("SMTP_PORT", "587").to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", "example.com"),
+    
+    # Authentication credentials
+    # Option 1: Use environment variables (recommended)
+    user_name: ENV.fetch("SMTP_USER_NAME", nil),
+    password: ENV.fetch("SMTP_PASSWORD", nil),
+    
+    # Option 2: Use Rails encrypted credentials (more secure)
+    # user_name: Rails.application.credentials.dig(:smtp, :user_name),
+    # password: Rails.application.credentials.dig(:smtp, :password),
+    
+    # Authentication method
+    authentication: :plain,
+    
+    # Enable STARTTLS for secure connections
+    enable_starttls_auto: true,
+    
+    # SSL/TLS options (uncomment if needed)
+    # ssl: true,
+    # openssl_verify_mode: "peer"
+  }
+  
+  # Common SMTP provider examples (uncomment and configure as needed):
+  #
+  # Gmail:
+  #   address: "smtp.gmail.com"
+  #   port: 587
+  #   user_name: "your-email@gmail.com"
+  #   password: "your-app-password"  # Use App Password, not regular password
+  #
+  # SendGrid:
+  #   address: "smtp.sendgrid.net"
+  #   port: 587
+  #   user_name: "apikey"
+  #   password: "your-sendgrid-api-key"
+  #
+  # Mailgun:
+  #   address: "smtp.mailgun.org"
+  #   port: 587
+  #   user_name: "your-mailgun-username"
+  #   password: "your-mailgun-password"
+  #
+  # Amazon SES:
+  #   address: "email-smtp.us-east-1.amazonaws.com"
+  #   port: 587
+  #   user_name: "your-ses-username"
+  #   password: "your-ses-password"
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

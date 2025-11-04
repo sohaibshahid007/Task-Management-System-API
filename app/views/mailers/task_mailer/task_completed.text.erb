@@ -1,0 +1,17 @@
+Task Completed
+
+Hello <%= @creator.full_name %>,
+
+The task you created has been completed:
+
+Title: <%= @task.title %>
+<% if @task.description.present? %>
+Description: <%= @task.description %>
+<% end %>
+Completed at: <%= @task.completed_at.strftime("%B %d, %Y at %I:%M %p") %>
+
+Great work! The task has been marked as completed.
+
+Best regards,
+Task Manager Team
+
