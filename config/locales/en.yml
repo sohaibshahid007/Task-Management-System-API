@@ -1,31 +1,110 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  # API Error Messages
+  errors:
+    validation_failed: "Validation failed"
+    resource_not_found: "Resource not found"
+    unauthorized: "You are not authorized to perform this action"
+    missing_parameter: "Required parameter is missing"
+    unexpected_error: "An unexpected error occurred"
+    invalid_request: "Invalid request parameters"
+    bad_request: "Bad request"
+    invalid_json: "Invalid JSON format in request body"
+    
+  # Task-related messages
+  tasks:
+    created_successfully: "Task created successfully"
+    creation_failed: "Task creation failed"
+    updated_successfully: "Task updated successfully"
+    update_failed: "Task update failed"
+    deleted_successfully: "Task deleted successfully"
+    deletion_failed: "Task deletion failed"
+    assigned_successfully: "Task assigned successfully"
+    assignment_failed: "Task assignment failed"
+    completed_successfully: "Task completed successfully"
+    completion_failed: "Task completion failed"
+    id_required: "Task ID is required"
+    parameters_required: "Task parameters are required"
+    already_completed: "Task is already completed"
+    already_assigned: "Task is already assigned to this user"
+    export_queued: "Export job queued. You will receive an email when ready."
+    export_failed: "Failed to queue export job. Please try again later."
+    export_service_unavailable: "Export service is currently unavailable. Please try again later."
+    
+  # User-related messages
+  users:
+    created_successfully: "User created successfully"
+    updated_successfully: "User updated successfully"
+    update_failed: "User update failed"
+    deleted_successfully: "User deleted successfully"
+    deletion_failed: "User deletion failed"
+    id_required: "User ID is required"
+    parameters_required: "User parameters are required"
+    cannot_delete_own_account: "You cannot delete your own account"
+    
+  # Comment-related messages
+  comments:
+    created_successfully: "Comment created successfully"
+    creation_failed: "Comment creation failed"
+    deleted_successfully: "Comment deleted successfully"
+    content_required: "Content is required"
+    id_required: "Comment ID is required"
+    
+  # Authentication messages
+  auth:
+    login_successful: "Logged in successfully"
+    login_failed: "Invalid email or password"
+    signup_successful: "Account created successfully"
+    signup_failed: "User creation failed"
+    logout_successful: "Logged out successfully"
+    email_required: "Email is required"
+    password_required: "Password is required"
+    first_name_required: "First name is required"
+    last_name_required: "Last name is required"
+    password_too_short: "Password must be at least 6 characters"
+    password_mismatch: "Password and password confirmation do not match"
+    invalid_credentials: "Invalid email or password"
+    authentication_required: "Authentication required. Please provide a valid token."
+    password_reset_sent: "Password reset instructions sent to your email"
+    password_reset_failed: "Failed to send password reset instructions"
+    password_reset_confirmation: "If an account exists with that email, password reset instructions have been sent"
+    
+  # Service validation messages
+  services:
+    task_creation:
+      unexpected_error: "An unexpected error occurred while creating the task"
+      invalid_user: "Invalid user provided"
+      invalid_priority: "Invalid priority. Must be one of: %{priorities}"
+      assignee_not_found: "Assignee not found"
+      title_required: "Title is required"
+      parameters_required: "Task parameters are required"
+      missing_parameter: "Missing required parameter: %{param}"
+    task_completion:
+      unexpected_error: "An unexpected error occurred while completing the task"
+      invalid_task: "Invalid task provided"
+      invalid_user: "Invalid user provided"
+      already_completed: "Task is already completed"
+    task_assignment:
+      unexpected_error: "An unexpected error occurred while assigning the task"
+      invalid_task: "Invalid task provided"
+      invalid_assignee: "Invalid assignee provided"
+      invalid_user: "Invalid user provided for assignment"
+      unauthorized: "You are not authorized to assign tasks"
+      assignee_not_found: "Assignee not found"
+      already_assigned: "Task is already assigned to this user"
+      
+  # Parameter validation messages
+  validations:
+    missing_parameters: "Missing required parameters"
+    invalid_signup_parameters: "Invalid signup parameters"
+    assignee_id_required: "Assignee ID is required"
+    task_id_required: "Task ID is required"
+    user_id_required: "User ID is required"
+    comment_id_required: "Comment ID is required"
+    
+  # Mailer subjects
+  mailers:
+    task:
+      assigned_subject: "New Task Assigned: %{title}"
+      completed_subject: "Task Completed: %{title}"
+      reminder_subject: "Reminder: Task Due Tomorrow - %{title}"
+      export_subject: "Your Tasks Export"
