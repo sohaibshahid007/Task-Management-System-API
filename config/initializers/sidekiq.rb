@@ -3,11 +3,12 @@ require Rails.root.join("lib", "middleware", "sidekiq_logging_middleware")
 require Rails.root.join("lib", "middleware", "sidekiq_error_tracking_middleware")
 
 # Sidekiq configuration
+# Queue management is configured in config/sidekiq.yml
 Sidekiq.configure_server do |config|
   config.redis = { url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0") }
 
-  # Configure queues with priorities
-  # Higher priority queues are processed first
+  # Poll interval for checking new jobs
+  # Lower values = more responsive, but higher CPU usage
   config.poll_interval = 1
 
   # Custom middleware for logging and error tracking

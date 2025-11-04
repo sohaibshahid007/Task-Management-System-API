@@ -1,0 +1,49 @@
+# Sidekiq Queue Management Configuration
+# This file configures queue priorities, weights, and processing order
+#
+# Usage:
+#   bundle exec sidekiq -C config/sidekiq.yml
+#   OR
+#   bundle exec sidekiq -c config/sidekiq.yml
+#
+# Queue Processing Order (processed in this order):
+# 1. default - High priority jobs (task notifications, urgent tasks)
+# 2. notifications - Medium priority (reminders, alerts)
+# 3. exports - Medium-low priority (data exports, reports)
+# 4. low_priority - Low priority (archival, cleanup, batch operations)
+
+# Redis connection
+# :redis:
+#   :url: redis://localhost:6379/0
+#   :namespace: sidekiq
+
+# Queue configuration
+# Process queues in priority order (first listed = highest priority)
+:queues:
+  - default        # High priority: TaskNotificationJob (task assigned, completed)
+  - notifications  # Medium priority: TaskReminderJob (overdue reminders)
+  - exports        # Medium-low priority: DataExportJob (CSV exports, reports)
+  - low_priority   # Low priority: TaskArchivalJob (archiving, cleanup)
+
+# Alternative: Use weighted queues for more granular control
+# Weights determine how often each queue is polled
+# Higher weight = more frequent processing
+# Uncomment below if you want weighted queue processing:
+#
+# :queues:
+#   - [default, 10]      # Highest weight - processed 10x more frequently
+#   - [notifications, 5] # Medium weight - processed 5x more frequently
+#   - [exports, 2]       # Lower weight - processed 2x more frequently
+#   - [low_priority, 1]  # Lowest weight - processed least frequently
+
+# Concurrency settings
+# :concurrency: 25  # Number of threads to process jobs (default: 25)
+
+# Poll interval (how often to check for new jobs)
+# Lower values = more responsive, but higher CPU usage
+# :poll_interval: 5  # Seconds (default: 5)
+
+# Additional Sidekiq configuration options
+# :max_retries: 25        # Maximum retry attempts for failed jobs
+# :timeout: 8             # Job timeout in seconds
+# :dead_max_jobs: 10000   # Maximum dead jobs to keep
