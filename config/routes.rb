@@ -1,10 +1,57 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Devise routes for user authentication
+  devise_for :users
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  namespace :api do
+    namespace :v1 do
+      post "auth/login", to: "auth#login"
+      post "auth/signup", to: "auth#signup"
+      post "auth/logout", to: "auth#logout"
+      post "auth/password/reset", to: "auth#password_reset"
+
+      resources :users, only: [ :index, :show, :update, :destroy ] do
+      end
+
+      resources :tasks do
+        resources :comments, only: [ :index, :create ], shallow: true
+
+        member do
+          post :assign
+          post :complete
+          post :export
+        end
+
+        collection do
+          get :dashboard
+          get :overdue
+        end
+      end
+
+      resources :comments, only: [ :destroy ]
+    end
+
+    namespace :v2 do
+      resources :tasks, only: [ :index, :show, :update, :destroy ] do
+      end
+    end
+  end
+
+  concern :commentable do
+    resources :comments, only: [ :index, :create, :destroy ], shallow: true
+  end
+
+  concern :assignable do
+    member do
+      post :assign
+    end
+  end
+
+  concern :completable do
+    member do
+      post :complete
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  match "/api/*path", to: "errors#not_found", via: :all, constraints: lambda { |req| req.format.json? }
 end

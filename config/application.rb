@@ -24,6 +24,10 @@ module TaskManagerApi
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    # Configure exceptions app to use custom error controller for API JSON responses
+    # This ensures API requests get JSON error responses instead of HTML
+    config.exceptions_app = ->(env) { ErrorsController.action(:internal_server_error).call(env) }
+
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
