@@ -103,7 +103,6 @@ A comprehensive Ruby on Rails RESTful API for task management with role-based ac
 
 The API will be available at `http://localhost:3000`
 
-
 ## I’ve also added the rails-erd gem to the Gemfile and included the generated erd.pdf file in the project root directory.
 
 ### Seed Data
@@ -205,7 +204,12 @@ curl -X POST http://localhost:3000/api/v1/tasks \
     }
   }'
 ```
+
 ## I’ve added the create task CURL request, and the other remaining endpoints above. All endpoints are added in postman collection for documentation reference.
+
+## The Postman collection link is provided below.
+
+https://www.postman.com/suhaibshahid007/my-workspace/overview
 
 **Get Dashboard:**
 
@@ -270,7 +274,6 @@ Sidekiq is configured with multiple queues:
 - `low_priority` - Archival tasks
 - `exports` - Data export jobs
 
-
 ## Database Schema
 
 ### Users
@@ -317,7 +320,6 @@ The API uses URL path versioning:
 - `/api/v1/*` - Version 1 (snake_case responses)
 - `/api/v2/*` - Version 2 (camelCase responses - breaking change)
 
-
 ### Code Quality
 
 - Rubocop for code style
@@ -326,6 +328,7 @@ The API uses URL path versioning:
 
 DATABASE_URL=postgresql://localhost/task_manager_api_development
 REDIS_URL=redis://localhost:6379/0
+
 ```
 
 ## Production Considerations
@@ -366,3 +369,4 @@ Sidekiq jobs handle:
 - Long-running operations
 - Batch processing
 
+```
