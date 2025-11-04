@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe TaskCompletionService do
+RSpec.describe TaskCompletion do
   let(:task) { create(:task, status: :pending) }
   let(:user) { create(:user) }
 
   describe '.call' do
     context 'with valid task' do
       it 'marks task as completed' do
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result.success?).to be true
         expect(task.reload.status).to eq('completed')
@@ -16,7 +16,7 @@ RSpec.describe TaskCompletionService do
       it 'sets completed_at timestamp' do
         freeze_time = Time.current
         travel_to freeze_time
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result.success?).to be true
         expect(task.reload.completed_at).to be_within(1.second).of(freeze_time)
@@ -24,7 +24,7 @@ RSpec.describe TaskCompletionService do
       end
 
       it 'returns consistent result object' do
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result).to respond_to(:success?)
         expect(result).to respond_to(:data)
@@ -34,7 +34,7 @@ RSpec.describe TaskCompletionService do
       end
 
       it 'returns completed task in result data' do
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result.data).to eq(task.reload)
         expect(result.data.status).to eq('completed')
@@ -42,7 +42,7 @@ RSpec.describe TaskCompletionService do
 
       it 'triggers notification to creator via Sidekiq' do
         expect {
-          TaskCompletionService.call(task: task, user: user)
+          TaskCompletion.call(task: task, user: user)
         }.to change { TaskNotificationJob.jobs.size }.by(1)
 
         job = TaskNotificationJob.jobs.last
@@ -54,7 +54,7 @@ RSpec.describe TaskCompletionService do
       let(:completed_task) { create(:task, status: :completed, completed_at: 1.day.ago) }
 
       it 'returns failure with appropriate error message' do
-        result = TaskCompletionService.call(task: completed_task, user: user)
+        result = TaskCompletion.call(task: completed_task, user: user)
 
         expect(result.success?).to be false
         expect(result.errors).to include('Task is already completed')
@@ -63,7 +63,7 @@ RSpec.describe TaskCompletionService do
 
       it 'does not send notification for already completed task' do
         expect {
-          TaskCompletionService.call(task: completed_task, user: user)
+          TaskCompletion.call(task: completed_task, user: user)
         }.not_to change { TaskNotificationJob.jobs.size }
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe TaskCompletionService do
       end
 
       it 'returns failure with errors' do
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -85,21 +85,21 @@ RSpec.describe TaskCompletionService do
 
       it 'does not send notification when update fails' do
         expect {
-          TaskCompletionService.call(task: task, user: user)
+          TaskCompletion.call(task: task, user: user)
         }.not_to change { TaskNotificationJob.jobs.size }
       end
     end
 
     context 'error handling' do
       it 'validates task parameter' do
-        result = TaskCompletionService.call(task: nil, user: user)
+        result = TaskCompletion.call(task: nil, user: user)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
       end
 
       it 'validates user parameter' do
-        result = TaskCompletionService.call(task: task, user: nil)
+        result = TaskCompletion.call(task: task, user: nil)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -108,7 +108,7 @@ RSpec.describe TaskCompletionService do
       it 'handles database errors gracefully' do
         allow(task).to receive(:update).and_raise(ActiveRecord::RecordInvalid.new(task))
 
-        result = TaskCompletionService.call(task: task, user: user)
+        result = TaskCompletion.call(task: task, user: user)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -117,7 +117,7 @@ RSpec.describe TaskCompletionService do
 
     context 'service is testable in isolation' do
       it 'validates inputs before performing operation' do
-        result = TaskCompletionService.call(task: nil, user: user)
+        result = TaskCompletion.call(task: nil, user: user)
 
         expect(result.success?).to be false
       end

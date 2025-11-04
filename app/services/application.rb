@@ -1,5 +1,5 @@
 # Base service class for consistent result objects
-class ApplicationService
+class Application
   Result = Struct.new(:success?, :data, :errors, keyword_init: true)
 
   def self.call(*args, **kwargs)

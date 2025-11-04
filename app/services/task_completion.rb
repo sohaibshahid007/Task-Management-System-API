@@ -1,4 +1,4 @@
-class TaskCompletionService < ApplicationService
+class TaskCompletion < Application
   def initialize(task:, user:)
     @task = task
     @user = user
@@ -19,9 +19,9 @@ class TaskCompletionService < ApplicationService
         begin
           TaskNotificationJob.perform_async(@task.id, "completed")
         rescue Redis::CannotConnectError, Redis::TimeoutError, Errno::ECONNREFUSED, Redis::ConnectionError => e
-          Rails.logger.warn "TaskCompletionService: Failed to enqueue notification job (Redis connection error): #{e.class} - #{e.message}"
+          Rails.logger.warn "TaskCompletion: Failed to enqueue notification job (Redis connection error): #{e.class} - #{e.message}"
         rescue => e
-          Rails.logger.warn "TaskCompletionService: Failed to enqueue notification job: #{e.class} - #{e.message}"
+          Rails.logger.warn "TaskCompletion: Failed to enqueue notification job: #{e.class} - #{e.message}"
           Rails.logger.debug e.backtrace.first(3).join("\n") if Rails.env.development?
         end
       end
@@ -33,7 +33,7 @@ class TaskCompletionService < ApplicationService
   rescue ArgumentError => e
     failure([ e.message ])
   rescue StandardError => e
-    Rails.logger.error "TaskCompletionService error: #{e.class} - #{e.message}"
+    Rails.logger.error "TaskCompletion error: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     failure([ I18n.t("services.task_completion.unexpected_error") ])
   end

@@ -1,4 +1,4 @@
-class TaskCreationService < ApplicationService
+class TaskCreation < Application
   def initialize(user:, params:)
     @user = user
     @params = params
@@ -21,7 +21,7 @@ class TaskCreationService < ApplicationService
       failure(format_errors(task.errors))
     end
   rescue StandardError => e
-    Rails.logger.error "TaskCreationService error: #{e.class} - #{e.message}"
+    Rails.logger.error "TaskCreation error: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     failure([ I18n.t("services.task_creation.unexpected_error") ])
   end

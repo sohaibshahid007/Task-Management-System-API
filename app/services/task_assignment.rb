@@ -1,4 +1,4 @@
-class TaskAssignmentService < ApplicationService
+class TaskAssignment < Application
   def initialize(task:, assignee:, assigned_by:)
     @task = task
     @assignee = assignee
@@ -27,9 +27,9 @@ class TaskAssignmentService < ApplicationService
         begin
           TaskNotificationJob.perform_async(@task.id, "assigned")
         rescue Redis::CannotConnectError, Redis::TimeoutError, Errno::ECONNREFUSED, Redis::ConnectionError => e
-          Rails.logger.warn "TaskAssignmentService: Failed to enqueue notification job (Redis connection error): #{e.class} - #{e.message}"
+          Rails.logger.warn "TaskAssignment: Failed to enqueue notification job (Redis connection error): #{e.class} - #{e.message}"
         rescue => e
-          Rails.logger.warn "TaskAssignmentService: Failed to enqueue notification job: #{e.class} - #{e.message}"
+          Rails.logger.warn "TaskAssignment: Failed to enqueue notification job: #{e.class} - #{e.message}"
           Rails.logger.debug e.backtrace.first(3).join("\n") if Rails.env.development?
         end
       end
@@ -41,7 +41,7 @@ class TaskAssignmentService < ApplicationService
   rescue ArgumentError => e
     failure([ e.message ])
   rescue StandardError => e
-    Rails.logger.error "TaskAssignmentService error: #{e.class} - #{e.message}"
+    Rails.logger.error "TaskAssignment error: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     failure([ I18n.t("services.task_assignment.unexpected_error") ])
   end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TaskAssignmentService do
+RSpec.describe TaskAssignment do
   let(:task) { create(:task) }
   let(:assignee) { create(:user) }
 
@@ -9,14 +9,14 @@ RSpec.describe TaskAssignmentService do
       let(:admin) { create(:user, :admin) }
 
       it 'assigns task successfully' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be true
         expect(task.reload.assignee).to eq(assignee)
       end
 
       it 'returns consistent result object' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result).to respond_to(:success?)
         expect(result).to respond_to(:data)
@@ -28,13 +28,13 @@ RSpec.describe TaskAssignmentService do
       it 'updates task assignee' do
         task_without_assignee = create(:task, assignee: nil)
         expect {
-          TaskAssignmentService.call(task: task_without_assignee, assignee: assignee, assigned_by: admin)
+          TaskAssignment.call(task: task_without_assignee, assignee: assignee, assigned_by: admin)
         }.to change { task_without_assignee.reload.assignee }.from(nil).to(assignee)
       end
 
       it 'sends assignment notification via Sidekiq' do
         expect {
-          TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+          TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
         }.to change { TaskNotificationJob.jobs.size }.by(1)
 
         job = TaskNotificationJob.jobs.last
@@ -42,7 +42,7 @@ RSpec.describe TaskAssignmentService do
       end
 
       it 'returns updated task in result data' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result.data.assignee).to eq(assignee)
       end
@@ -52,7 +52,7 @@ RSpec.describe TaskAssignmentService do
       let(:manager) { create(:user, :manager) }
 
       it 'assigns task successfully' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: manager)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: manager)
 
         expect(result.success?).to be true
         expect(task.reload.assignee).to eq(assignee)
@@ -60,7 +60,7 @@ RSpec.describe TaskAssignmentService do
 
       it 'sends notification when manager assigns task' do
         expect {
-          TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: manager)
+          TaskAssignment.call(task: task, assignee: assignee, assigned_by: manager)
         }.to change { TaskNotificationJob.jobs.size }.by(1)
       end
     end
@@ -69,7 +69,7 @@ RSpec.describe TaskAssignmentService do
       let(:member) { create(:user, :member) }
 
       it 'returns failure with authorization error' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: member)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: member)
 
         expect(result.success?).to be false
         expect(result.errors).to include('You are not authorized to assign tasks')
@@ -78,14 +78,14 @@ RSpec.describe TaskAssignmentService do
 
       it 'does not update task assignee' do
         original_assignee = task.assignee
-        TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: member)
+        TaskAssignment.call(task: task, assignee: assignee, assigned_by: member)
 
         expect(task.reload.assignee).to eq(original_assignee)
       end
 
       it 'does not send notification when unauthorized' do
         expect {
-          TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: member)
+          TaskAssignment.call(task: task, assignee: assignee, assigned_by: member)
         }.not_to change { TaskNotificationJob.jobs.size }
       end
     end
@@ -94,7 +94,7 @@ RSpec.describe TaskAssignmentService do
       let(:admin) { create(:user, :admin) }
 
       it 'validates assignee exists' do
-        result = TaskAssignmentService.call(task: task, assignee: nil, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: nil, assigned_by: admin)
 
         expect(result.success?).to be false
         expect(result.errors).to include('Assignee not found')
@@ -102,14 +102,14 @@ RSpec.describe TaskAssignmentService do
 
       it 'does not update task when assignee is invalid' do
         original_assignee = task.assignee
-        TaskAssignmentService.call(task: task, assignee: nil, assigned_by: admin)
+        TaskAssignment.call(task: task, assignee: nil, assigned_by: admin)
 
         expect(task.reload.assignee).to eq(original_assignee)
       end
 
       it 'does not send notification when assignee is invalid' do
         expect {
-          TaskAssignmentService.call(task: task, assignee: nil, assigned_by: admin)
+          TaskAssignment.call(task: task, assignee: nil, assigned_by: admin)
         }.not_to change { TaskNotificationJob.jobs.size }
       end
     end
@@ -119,7 +119,7 @@ RSpec.describe TaskAssignmentService do
       let(:assigned_task) { create(:task, assignee: assignee) }
 
       it 'returns failure with appropriate message' do
-        result = TaskAssignmentService.call(task: assigned_task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: assigned_task, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be false
         expect(result.errors).to include('Task is already assigned to this user')
@@ -127,7 +127,7 @@ RSpec.describe TaskAssignmentService do
 
       it 'does not send duplicate notification' do
         expect {
-          TaskAssignmentService.call(task: assigned_task, assignee: assignee, assigned_by: admin)
+          TaskAssignment.call(task: assigned_task, assignee: assignee, assigned_by: admin)
         }.not_to change { TaskNotificationJob.jobs.size }
       end
     end
@@ -136,14 +136,14 @@ RSpec.describe TaskAssignmentService do
       let(:admin) { create(:user, :admin) }
 
       it 'validates task parameter' do
-        result = TaskAssignmentService.call(task: nil, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: nil, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
       end
 
       it 'validates assigned_by parameter' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: nil)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: nil)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -152,7 +152,7 @@ RSpec.describe TaskAssignmentService do
       it 'handles database errors gracefully' do
         allow(task).to receive(:update).and_raise(ActiveRecord::RecordInvalid.new(task))
 
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -163,7 +163,7 @@ RSpec.describe TaskAssignmentService do
         allow(task).to receive(:update).and_return(false)
         allow(task).to receive(:errors).and_return(task.errors)
 
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be false
         expect(result.errors).to be_present
@@ -176,13 +176,13 @@ RSpec.describe TaskAssignmentService do
 
       it 'checks authorization before performing operation' do
         member = create(:user, :member)
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: member)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: member)
 
         expect(result.success?).to be false
       end
 
       it 'validates inputs before performing operation' do
-        result = TaskAssignmentService.call(task: nil, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: nil, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be false
       end
@@ -192,7 +192,7 @@ RSpec.describe TaskAssignmentService do
       let(:admin) { create(:user, :admin) }
 
       it 'only handles task assignment logic' do
-        result = TaskAssignmentService.call(task: task, assignee: assignee, assigned_by: admin)
+        result = TaskAssignment.call(task: task, assignee: assignee, assigned_by: admin)
 
         expect(result.success?).to be true
       end
