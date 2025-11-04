@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_04_140007) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_04_201203) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,11 +35,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_04_140007) do
     t.integer "status", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["assignee_id", "status"], name: "index_tasks_on_assignee_id_and_status"
     t.index ["assignee_id"], name: "index_tasks_on_assignee_id"
     t.index ["completed_at"], name: "index_tasks_on_completed_at"
+    t.index ["creator_id", "status"], name: "index_tasks_on_creator_id_and_status"
     t.index ["creator_id"], name: "index_tasks_on_creator_id"
+    t.index ["due_date", "status"], name: "index_tasks_on_due_date_and_status"
     t.index ["due_date"], name: "index_tasks_on_due_date"
+    t.index ["priority", "status"], name: "index_tasks_on_priority_and_status"
     t.index ["priority"], name: "index_tasks_on_priority"
+    t.index ["status", "completed_at"], name: "index_tasks_on_status_and_completed_at"
     t.index ["status"], name: "index_tasks_on_status"
   end
 
