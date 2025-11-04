@@ -70,16 +70,17 @@ group :development, :test do
 
   # Email preview in browser (development only)
   gem "letter_opener"
-
-  # Testing
-  gem "rspec-rails"
-  gem "factory_bot_rails"
-  gem "faker"
   gem "pry-rails"
   gem "bullet"
+  
+  # Database ERD (Entity Relationship Diagram) generator
+  gem "rails-erd"
 end
 
 group :test do
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
   gem "shoulda-matchers"
   gem "database_cleaner-active_record"
   gem "simplecov", require: false
