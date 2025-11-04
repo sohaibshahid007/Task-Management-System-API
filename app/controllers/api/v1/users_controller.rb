@@ -23,7 +23,13 @@ class Api::V1::UsersController < Api::BaseController
       )
     end
 
-    if @user.update(user_params)
+    @user.assign_attributes(user_params)
+
+    if params[:role].present? && current_user&.admin?
+      @user.role = params[:role]
+    end
+
+    if @user.save
       render json: UserSerializer.new(@user).serializable_hash
     else
       render_validation_error(
@@ -88,6 +94,6 @@ class Api::V1::UsersController < Api::BaseController
   end
 
   def user_params
-    params.permit(:first_name, :last_name, :email, :role)
+    params.permit(:first_name, :last_name, :email)
   end
 end
