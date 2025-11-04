@@ -72,7 +72,7 @@ group :development, :test do
   gem "letter_opener"
   gem "pry-rails"
   gem "bullet"
-  
+
   # Database ERD (Entity Relationship Diagram) generator
   gem "rails-erd"
 end

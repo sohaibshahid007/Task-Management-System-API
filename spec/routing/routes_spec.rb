@@ -169,4 +169,3 @@ RSpec.describe 'Routes Configuration', type: :routing do
     end
   end
 end
-

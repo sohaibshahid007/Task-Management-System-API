@@ -21,9 +21,9 @@ class TaskNotificationJob
 
     begin
       case action.to_s
-      when 'created', 'assigned'
+      when "created", "assigned"
         send_assignment_notification(task) if task.assignee.present?
-      when 'completed'
+      when "completed"
         send_completion_notification(task)
       else
         Rails.logger.warn "TaskNotificationJob: Unknown action '#{action}' for task #{task_id}"
@@ -61,4 +61,3 @@ class TaskNotificationJob
     raise
   end
 end
-

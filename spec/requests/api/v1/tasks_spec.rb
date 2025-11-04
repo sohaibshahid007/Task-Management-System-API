@@ -121,4 +121,3 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
     end
   end
 end
-

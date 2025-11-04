@@ -13,12 +13,12 @@ module PerformanceMonitoring
   def track_performance_metrics
     start_time = Time.current
     start_query_count = current_query_count
-    
+
     yield
-    
+
     duration = ((Time.current - start_time) * 1000).round(2)
     query_count = current_query_count - start_query_count
-    
+
     # Log performance metrics for this action
     log_action_performance(
       controller: self.class.name,
@@ -35,12 +35,12 @@ module PerformanceMonitoring
     # Log to Rails logger
     Rails.logger.info "[Controller Performance] #{controller}##{action} | " \
                       "Duration: #{duration}ms | Queries: #{query_count}"
-    
+
     # Warn about slow actions
     if duration > 500 # > 500ms
       Rails.logger.warn "[Controller Performance] SLOW ACTION: #{controller}##{action} took #{duration}ms"
     end
-    
+
     # Warn about high query count
     if query_count > 10
       Rails.logger.warn "[Controller Performance] HIGH QUERY COUNT: #{controller}##{action} executed #{query_count} queries"
@@ -54,4 +54,3 @@ module PerformanceMonitoring
     0
   end
 end
-

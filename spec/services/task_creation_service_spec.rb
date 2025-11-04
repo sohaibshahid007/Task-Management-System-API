@@ -102,7 +102,7 @@ RSpec.describe TaskCreation do
         }.to change { TaskNotificationJob.jobs.size }.by(1)
 
         job = TaskNotificationJob.jobs.last
-        expect(job['args']).to eq([result.data.id, 'created'])
+        expect(job['args']).to eq([ result.data.id, 'created' ])
       end
 
       it 'does not send notification when no assignee' do
@@ -157,4 +157,3 @@ RSpec.describe TaskCreation do
     end
   end
 end
-

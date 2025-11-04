@@ -38,7 +38,7 @@ RSpec.describe TaskAssignment do
         }.to change { TaskNotificationJob.jobs.size }.by(1)
 
         job = TaskNotificationJob.jobs.last
-        expect(job['args']).to eq([task.id, 'assigned'])
+        expect(job['args']).to eq([ task.id, 'assigned' ])
       end
 
       it 'returns updated task in result data' do
@@ -199,4 +199,3 @@ RSpec.describe TaskAssignment do
     end
   end
 end
-

@@ -4,8 +4,8 @@ class TaskReminderJob
 
   def perform
     begin
-      due_tomorrow = Task.where('due_date BETWEEN ? AND ?', 
-                                1.day.from_now.beginning_of_day, 
+      due_tomorrow = Task.where("due_date BETWEEN ? AND ?",
+                                1.day.from_now.beginning_of_day,
                                 1.day.from_now.end_of_day)
                          .where.not(status: :completed)
                          .includes(:assignee, :creator)
@@ -33,4 +33,3 @@ class TaskReminderJob
     end
   end
 end
-

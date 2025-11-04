@@ -66,33 +66,33 @@ Rails.application.configure do
   # Configure SMTP delivery method for production
   # Use environment variables or Rails credentials for sensitive data
   config.action_mailer.delivery_method = :smtp
-  
+
   config.action_mailer.smtp_settings = {
     # SMTP server address (common providers listed below)
     address: ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
     port: ENV.fetch("SMTP_PORT", "587").to_i,
     domain: ENV.fetch("SMTP_DOMAIN", "example.com"),
-    
+
     # Authentication credentials
     # Option 1: Use environment variables (recommended)
     user_name: ENV.fetch("SMTP_USER_NAME", nil),
     password: ENV.fetch("SMTP_PASSWORD", nil),
-    
+
     # Option 2: Use Rails encrypted credentials (more secure)
     # user_name: Rails.application.credentials.dig(:smtp, :user_name),
     # password: Rails.application.credentials.dig(:smtp, :password),
-    
+
     # Authentication method
     authentication: :plain,
-    
+
     # Enable STARTTLS for secure connections
-    enable_starttls_auto: true,
-    
+    enable_starttls_auto: true
+
     # SSL/TLS options (uncomment if needed)
     # ssl: true,
     # openssl_verify_mode: "peer"
   }
-  
+
   # Common SMTP provider examples (uncomment and configure as needed):
   #
   # Gmail:

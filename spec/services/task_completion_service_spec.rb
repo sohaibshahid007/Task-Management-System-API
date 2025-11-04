@@ -46,7 +46,7 @@ RSpec.describe TaskCompletion do
         }.to change { TaskNotificationJob.jobs.size }.by(1)
 
         job = TaskNotificationJob.jobs.last
-        expect(job['args']).to eq([task.id, 'completed'])
+        expect(job['args']).to eq([ task.id, 'completed' ])
       end
     end
 
@@ -124,4 +124,3 @@ RSpec.describe TaskCompletion do
     end
   end
 end
-

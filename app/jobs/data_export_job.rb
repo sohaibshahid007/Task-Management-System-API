@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 class DataExportJob
   include Sidekiq::Job
@@ -15,16 +15,16 @@ class DataExportJob
       Rails.logger.error "DataExportJob failed: User not found with id #{user_id}"
       return
     end
-    
+
     begin
       tasks = user.assigned_tasks.includes(:creator, :assignee)
-      
+
       if tasks.empty?
         Rails.logger.info "DataExportJob: No tasks found for user #{user_id}"
         TaskMailer.data_export(user, generate_empty_csv).deliver_now
         return
       end
-      
+
       csv_data = generate_csv(tasks)
       TaskMailer.data_export(user, csv_data).deliver_now
       Rails.logger.info "DataExportJob: Export sent successfully for user #{user_id}"
@@ -39,8 +39,8 @@ class DataExportJob
 
   def generate_csv(tasks)
     CSV.generate(headers: true) do |csv|
-      csv << ['Title', 'Description', 'Status', 'Priority', 'Due Date', 'Created At', 'Creator', 'Assignee']
-      
+      csv << [ "Title", "Description", "Status", "Priority", "Due Date", "Created At", "Creator", "Assignee" ]
+
       tasks.each do |task|
         csv << [
           task.title,
@@ -58,8 +58,7 @@ class DataExportJob
 
   def generate_empty_csv
     CSV.generate(headers: true) do |csv|
-      csv << ['Title', 'Description', 'Status', 'Priority', 'Due Date', 'Created At', 'Creator', 'Assignee']
+      csv << [ "Title", "Description", "Status", "Priority", "Due Date", "Created At", "Creator", "Assignee" ]
     end
   end
 end
-

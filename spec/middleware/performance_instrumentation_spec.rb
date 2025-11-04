@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Middleware::PerformanceInstrumentation, type: :middleware do
-  let(:app) { ->(env) { [200, {}, ['OK']] } }
+  let(:app) { ->(env) { [ 200, {}, [ 'OK' ] ] } }
   let(:middleware) { described_class.new(app) }
   let(:env) { Rack::MockRequest.env_for('/api/v1/tasks') }
 
@@ -33,13 +33,12 @@ RSpec.describe Middleware::PerformanceInstrumentation, type: :middleware do
         end
         method.call(*args)
       end
-      
+
       # Simulate slow request
       allow(Time).to receive(:current).and_return(Time.current, Time.current + 2.seconds)
-      
+
       expect(Rails.logger).to receive(:warn).with(/SLOW REQUEST/)
       middleware.call(env)
     end
   end
 end
-

@@ -56,9 +56,9 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double
       end
       allow(mailer_double).to receive(:deliver_now)
-      
+
       described_class.new.perform(user.id)
-      
+
       # Verify CSV content
       expect(csv_data_received).to be_a(String)
       csv = CSV.parse(csv_data_received, headers: true)
@@ -74,9 +74,9 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double
       end
       allow(mailer_double).to receive(:deliver_now)
-      
+
       described_class.new.perform(user.id)
-      
+
       csv = CSV.parse(csv_data_received, headers: true)
       task_titles = csv.map { |row| row['Title'] }
       expect(task_titles).to include('Task 1', 'Task 2')
@@ -91,9 +91,9 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double
       end
       allow(mailer_double).to receive(:deliver_now)
-      
+
       described_class.new.perform(user.id)
-      
+
       csv = CSV.parse(csv_data_received, headers: true)
       headers = csv.headers
       expect(headers).to include('Title', 'Description', 'Status', 'Priority', 'Due Date', 'Created At', 'Creator', 'Assignee')
@@ -110,9 +110,9 @@ RSpec.describe DataExportJob, type: :job do
           mailer_double
         end
         allow(mailer_double).to receive(:deliver_now)
-        
+
         described_class.new.perform(user_without_tasks.id)
-        
+
         csv = CSV.parse(csv_data_received, headers: true)
         expect(csv.count).to eq(0)
         expect(csv.headers).to be_present
@@ -122,9 +122,9 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double = double('mailer')
         allow(TaskMailer).to receive(:data_export).and_return(mailer_double)
         allow(mailer_double).to receive(:deliver_now)
-        
+
         expect(Rails.logger).to receive(:info).with(/No tasks found for user/)
-        
+
         described_class.new.perform(user_without_tasks.id)
       end
     end
@@ -134,7 +134,7 @@ RSpec.describe DataExportJob, type: :job do
         it 'logs error and returns early' do
           expect(Rails.logger).to receive(:error).with(/User ID is required/)
           expect(TaskMailer).not_to receive(:data_export)
-          
+
           described_class.new.perform(nil)
         end
       end
@@ -143,7 +143,7 @@ RSpec.describe DataExportJob, type: :job do
         it 'logs error and returns early (idempotent)' do
           expect(Rails.logger).to receive(:error).with(/User not found/)
           expect(TaskMailer).not_to receive(:data_export)
-          
+
           # Should not raise error, just log and return (idempotent behavior)
           expect { described_class.new.perform(999999) }.not_to raise_error
         end
@@ -152,7 +152,7 @@ RSpec.describe DataExportJob, type: :job do
       context 'when CSV generation fails' do
         it 'raises error to trigger retry' do
           allow_any_instance_of(described_class).to receive(:generate_csv).and_raise(StandardError, 'CSV generation failed')
-          
+
           expect {
             described_class.new.perform(user.id)
           }.to raise_error(StandardError, 'CSV generation failed')
@@ -161,9 +161,9 @@ RSpec.describe DataExportJob, type: :job do
         it 'logs error details' do
           error = StandardError.new('CSV generation failed')
           allow_any_instance_of(described_class).to receive(:generate_csv).and_raise(error)
-          
+
           expect(Rails.logger).to receive(:error).at_least(:once)
-          
+
           begin
             described_class.new.perform(user.id)
           rescue StandardError
@@ -175,7 +175,7 @@ RSpec.describe DataExportJob, type: :job do
       context 'when mailer fails' do
         it 'raises error to trigger retry' do
           allow(TaskMailer).to receive(:data_export).and_raise(StandardError, 'Mail delivery failed')
-          
+
           expect {
             described_class.new.perform(user.id)
           }.to raise_error(StandardError, 'Mail delivery failed')
@@ -188,13 +188,13 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double = double('mailer')
         allow(TaskMailer).to receive(:data_export).and_return(mailer_double)
         allow(mailer_double).to receive(:deliver_now)
-        
+
         # First call
         described_class.new.perform(user.id)
-        
+
         # Second call with same parameters
         described_class.new.perform(user.id)
-        
+
         expect(TaskMailer).to have_received(:data_export).twice
       end
 
@@ -202,17 +202,17 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double = double('mailer')
         csv_data1 = nil
         csv_data2 = nil
-        
+
         allow(TaskMailer).to receive(:data_export) do |_, csv|
           csv_data1 ||= csv
           csv_data2 = csv if csv_data1
           mailer_double
         end
         allow(mailer_double).to receive(:deliver_now)
-        
+
         described_class.new.perform(user.id)
         described_class.new.perform(user.id)
-        
+
         # CSV content should be the same (excluding timestamps that might vary)
         expect(csv_data1).to be_present
         expect(csv_data2).to be_present
@@ -226,9 +226,9 @@ RSpec.describe DataExportJob, type: :job do
         mailer_double = double('mailer')
         allow(TaskMailer).to receive(:data_export).and_return(mailer_double)
         allow(mailer_double).to receive(:deliver_now)
-        
+
         expect(Rails.logger).to receive(:info).with(/Export sent successfully for user/)
-        
+
         described_class.new.perform(user.id)
       end
     end
@@ -242,9 +242,9 @@ RSpec.describe DataExportJob, type: :job do
           mailer_double
         end
         allow(mailer_double).to receive(:deliver_now)
-        
+
         described_class.new.perform(user.id)
-        
+
         csv = CSV.parse(csv_data_received, headers: true)
         expect(csv.first['Title']).to eq('Task 1')
       end
@@ -257,9 +257,9 @@ RSpec.describe DataExportJob, type: :job do
           mailer_double
         end
         allow(mailer_double).to receive(:deliver_now)
-        
+
         described_class.new.perform(user.id)
-        
+
         csv = CSV.parse(csv_data_received, headers: true)
         expect(csv.first['Creator']).to eq(creator.full_name)
       end
@@ -272,11 +272,11 @@ RSpec.describe DataExportJob, type: :job do
           assignee: user,
           creator: creator
         )
-        
+
         mailer_double = double('mailer')
         allow(TaskMailer).to receive(:data_export).and_return(mailer_double)
         allow(mailer_double).to receive(:deliver_now)
-        
+
         expect {
           described_class.new.perform(user.id)
         }.not_to raise_error
@@ -284,4 +284,3 @@ RSpec.describe DataExportJob, type: :job do
     end
   end
 end
-

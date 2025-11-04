@@ -5,7 +5,7 @@ class TaskArchivalJob
   def perform
     begin
       old_completed_tasks = Task.where(status: :completed)
-                                .where('completed_at < ?', 30.days.ago)
+                                .where("completed_at < ?", 30.days.ago)
 
       count = 0
       errors = []
@@ -28,4 +28,3 @@ class TaskArchivalJob
     end
   end
 end
-

@@ -6,19 +6,19 @@ if defined?(Bullet)
   # Test environment only
   if Rails.env.test?
     Bullet.enable = true
-    
+
     # Raise error in tests to catch N+1 queries
     Bullet.raise = true
-    
+
     # Log warnings
     Bullet.console = true
     Bullet.rails_logger = true
-    
+
     # Don't show browser notifications in tests
     Bullet.alert = false
     Bullet.bullet_logger = false
     Bullet.add_footer = false
-    
+
     # Performance monitoring integrations (disabled)
     Bullet.honeybadger = false
     Bullet.bugsnag = false
@@ -30,4 +30,3 @@ if defined?(Bullet)
     Bullet.enable = false
   end
 end
-

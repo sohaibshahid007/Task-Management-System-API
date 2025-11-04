@@ -14,8 +14,8 @@ module ErrorHandler
 
   def handle_record_invalid(exception)
     render_error(
-      code: 'VALIDATION_ERROR',
-      message: I18n.t('errors.validation_failed'),
+      code: "VALIDATION_ERROR",
+      message: I18n.t("errors.validation_failed"),
       details: exception.record.errors.full_messages,
       status: :unprocessable_entity
     )
@@ -23,8 +23,8 @@ module ErrorHandler
 
   def handle_record_not_found(exception)
     render_error(
-      code: 'NOT_FOUND',
-      message: I18n.t('errors.resource_not_found'),
+      code: "NOT_FOUND",
+      message: I18n.t("errors.resource_not_found"),
       details: { resource: exception.model },
       status: :not_found
     )
@@ -32,8 +32,8 @@ module ErrorHandler
 
   def handle_unauthorized(exception)
     render_error(
-      code: 'UNAUTHORIZED',
-      message: I18n.t('errors.unauthorized'),
+      code: "UNAUTHORIZED",
+      message: I18n.t("errors.unauthorized"),
       details: { policy: exception.policy&.class&.name },
       status: :unauthorized
     )
@@ -41,8 +41,8 @@ module ErrorHandler
 
   def handle_parameter_missing(exception)
     render_error(
-      code: 'MISSING_PARAMETER',
-      message: I18n.t('errors.missing_parameter'),
+      code: "MISSING_PARAMETER",
+      message: I18n.t("errors.missing_parameter"),
       details: { parameter: exception.param },
       status: :bad_request
     )
@@ -50,9 +50,9 @@ module ErrorHandler
 
   def handle_json_parse_error(exception)
     render_error(
-      code: 'BAD_REQUEST',
-      message: I18n.t('errors.invalid_json'),
-      details: { error: 'Invalid JSON in request body. Please check the format.' },
+      code: "BAD_REQUEST",
+      message: I18n.t("errors.invalid_json"),
+      details: { error: "Invalid JSON in request body. Please check the format." },
       status: :bad_request
     )
   end
@@ -60,15 +60,15 @@ module ErrorHandler
   def handle_standard_error(exception)
     Rails.logger.error "Unhandled error: #{exception.class} - #{exception.message}"
     Rails.logger.error exception.backtrace.join("\n")
-    
+
     if exception.is_a?(Pundit::Error)
       Rails.logger.error "Pundit error not caught by specific handler: #{exception.class}"
       return handle_unauthorized(exception) if exception.is_a?(Pundit::NotAuthorizedError)
     end
 
     render_error(
-      code: 'INTERNAL_SERVER_ERROR',
-      message: I18n.t('errors.unexpected_error'),
+      code: "INTERNAL_SERVER_ERROR",
+      message: I18n.t("errors.unexpected_error"),
       details: Rails.env.development? || Rails.env.test? ? { error: exception.message, class: exception.class.name, backtrace: exception.backtrace.first(5) } : {},
       status: :internal_server_error
     )
@@ -84,19 +84,19 @@ module ErrorHandler
     }, status: status
   end
 
-  def render_not_found(resource: 'Resource')
+  def render_not_found(resource: "Resource")
     render_error(
-      code: 'NOT_FOUND',
-      message: I18n.t('errors.resource_not_found', resource: resource),
+      code: "NOT_FOUND",
+      message: I18n.t("errors.resource_not_found", resource: resource),
       details: {},
       status: :not_found
     )
   end
 
   def render_unauthorized(message: nil)
-    message ||= I18n.t('errors.unauthorized')
+    message ||= I18n.t("errors.unauthorized")
     render_error(
-      code: 'UNAUTHORIZED',
+      code: "UNAUTHORIZED",
       message: message,
       details: {},
       status: :unauthorized
@@ -104,9 +104,9 @@ module ErrorHandler
   end
 
   def render_bad_request(message: nil, details: {})
-    message ||= I18n.t('errors.invalid_request')
+    message ||= I18n.t("errors.invalid_request")
     render_error(
-      code: 'BAD_REQUEST',
+      code: "BAD_REQUEST",
       message: message,
       details: details,
       status: :bad_request
@@ -114,13 +114,12 @@ module ErrorHandler
   end
 
   def render_validation_error(message: nil, errors: [])
-    message ||= I18n.t('errors.validation_failed')
+    message ||= I18n.t("errors.validation_failed")
     render_error(
-      code: 'VALIDATION_ERROR',
+      code: "VALIDATION_ERROR",
       message: message,
       details: { errors: errors },
       status: :unprocessable_entity
     )
   end
 end
-

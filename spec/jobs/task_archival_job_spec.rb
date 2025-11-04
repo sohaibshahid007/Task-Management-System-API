@@ -48,7 +48,7 @@ RSpec.describe TaskArchivalJob, type: :job do
 
     it 'logs number of archived tasks' do
       expect(Rails.logger).to receive(:info).with(/Archived \d+ tasks/)
-      
+
       described_class.new.perform
     end
 
@@ -84,9 +84,9 @@ RSpec.describe TaskArchivalJob, type: :job do
         allow(task).to receive(:update).and_return(false)
         allow(task).to receive(:errors).and_return(task.errors)
         allow(Task).to receive_message_chain(:where, :where, :find_each).and_yield(task)
-        
+
         expect(Rails.logger).to receive(:error).at_least(:once)
-        
+
         described_class.new.perform
       end
 
@@ -95,12 +95,12 @@ RSpec.describe TaskArchivalJob, type: :job do
         failing_task.update_column(:completed_at, 35.days.ago)
         working_task = create(:task, status: :completed)
         working_task.update_column(:completed_at, 40.days.ago)
-        
+
         failing_task.errors.add(:base, 'Error')
         allow(failing_task).to receive(:update).and_return(false)
         allow(failing_task).to receive(:errors).and_return(failing_task.errors)
         allow(Task).to receive_message_chain(:where, :where, :find_each).and_yield(failing_task).and_yield(working_task)
-        
+
         # Should still archive the working task
         expect {
           described_class.new.perform
@@ -109,7 +109,7 @@ RSpec.describe TaskArchivalJob, type: :job do
 
       it 'raises error on critical failures to trigger retry' do
         allow(Task).to receive(:where).and_raise(ActiveRecord::StatementInvalid.new('Database error'))
-        
+
         expect {
           described_class.new.perform
         }.to raise_error(ActiveRecord::StatementInvalid)
@@ -118,9 +118,9 @@ RSpec.describe TaskArchivalJob, type: :job do
       it 'logs critical errors with backtrace' do
         error = StandardError.new('Critical error')
         allow(Task).to receive(:where).and_raise(error)
-        
+
         expect(Rails.logger).to receive(:error).at_least(:once)
-        
+
         begin
           described_class.new.perform
         rescue StandardError
@@ -133,11 +133,11 @@ RSpec.describe TaskArchivalJob, type: :job do
       it 'can be safely run multiple times' do
         old_task = create(:task, status: :completed)
         old_task.update_column(:completed_at, 35.days.ago)
-        
+
         # First run
         described_class.new.perform
         expect(old_task.reload.status).to eq('archived')
-        
+
         # Second run - should not change already archived tasks
         expect {
           described_class.new.perform
@@ -147,11 +147,11 @@ RSpec.describe TaskArchivalJob, type: :job do
       it 'only processes tasks that need archiving' do
         old_task = create(:task, status: :completed)
         old_task.update_column(:completed_at, 35.days.ago)
-        
+
         # First run
         described_class.new.perform
         expect(old_task.reload.status).to eq('archived')
-        
+
         # Second run should not attempt to update already archived tasks
         # (The query excludes archived tasks, so it won't find them)
         expect {
@@ -164,9 +164,9 @@ RSpec.describe TaskArchivalJob, type: :job do
       it 'logs successful archival count' do
         task = create(:task, status: :completed)
         task.update_column(:completed_at, 35.days.ago)
-        
+
         expect(Rails.logger).to receive(:info).with(/Archived \d+ tasks/)
-        
+
         described_class.new.perform
       end
 
@@ -177,12 +177,11 @@ RSpec.describe TaskArchivalJob, type: :job do
         allow(task).to receive(:update).and_return(false)
         allow(task).to receive(:errors).and_return(task.errors)
         allow(Task).to receive_message_chain(:where, :where, :find_each).and_yield(task)
-        
+
         expect(Rails.logger).to receive(:warn).with(/Encountered \d+ errors/)
-        
+
         described_class.new.perform
       end
     end
   end
 end
-

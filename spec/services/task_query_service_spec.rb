@@ -19,7 +19,7 @@ RSpec.describe TaskQuery, type: :service do
       it 'returns all tasks' do
         params = ActionController::Parameters.new({})
         result = described_class.call(user: admin, params: params)
-        
+
         expect(result).to be_success
         expect(result.data.count).to eq(5)
       end
@@ -27,25 +27,25 @@ RSpec.describe TaskQuery, type: :service do
       it 'filters by status' do
         params = ActionController::Parameters.new({ status: 'pending' })
         result = described_class.call(user: admin, params: params)
-        
+
         expect(result).to be_success
         expect(result.data.count).to eq(3)
-        expect(result.data.pluck(:status).uniq).to eq(['pending'])
+        expect(result.data.pluck(:status).uniq).to eq([ 'pending' ])
       end
 
       it 'filters by priority' do
         params = ActionController::Parameters.new({ priority: 'high' })
         result = described_class.call(user: admin, params: params)
-        
+
         expect(result).to be_success
         expect(result.data.count).to eq(2)
-        expect(result.data.pluck(:priority).uniq).to eq(['high'])
+        expect(result.data.pluck(:priority).uniq).to eq([ 'high' ])
       end
 
       it 'combines multiple filters' do
         params = ActionController::Parameters.new({ status: 'pending', priority: 'high' })
         result = described_class.call(user: admin, params: params)
-        
+
         expect(result).to be_success
         expect(result.data.count).to eq(1)
       end
@@ -55,7 +55,7 @@ RSpec.describe TaskQuery, type: :service do
       it 'returns only tasks created by or assigned to the member' do
         params = ActionController::Parameters.new({})
         result = described_class.call(user: member, params: params)
-        
+
         expect(result).to be_success
         task_ids = result.data.pluck(:id)
         member_task_ids = (member.created_tasks.pluck(:id) + member.assigned_tasks.pluck(:id)).uniq
@@ -65,7 +65,7 @@ RSpec.describe TaskQuery, type: :service do
       it 'filters assigned_to_me tasks' do
         params = ActionController::Parameters.new({ assigned_to_me: 'true' })
         result = described_class.call(user: member, params: params)
-        
+
         expect(result).to be_success
         expect(result.data.count).to eq(1)
         expect(result.data.first.assignee_id).to eq(member.id)
@@ -74,9 +74,9 @@ RSpec.describe TaskQuery, type: :service do
       it 'filters created_by_me tasks' do
         params = ActionController::Parameters.new({ created_by_me: 'true' })
         result = described_class.call(user: member, params: params)
-        
+
         expect(result).to be_success
-        expect(result.data.pluck(:creator_id).uniq).to eq([member.id])
+        expect(result.data.pluck(:creator_id).uniq).to eq([ member.id ])
       end
     end
 
@@ -84,11 +84,10 @@ RSpec.describe TaskQuery, type: :service do
       it 'returns base query without filtering' do
         params = ActionController::Parameters.new({})
         result = described_class.call(user: admin, params: params)
-        
+
         expect(result).to be_success
         expect(result.data).to be_a(ActiveRecord::Relation)
       end
     end
   end
 end
-
