@@ -61,7 +61,6 @@ module ErrorHandler
     Rails.logger.error "Unhandled error: #{exception.class} - #{exception.message}"
     Rails.logger.error exception.backtrace.join("\n")
     
-    # If it's a Pundit error that wasn't caught, log it specially
     if exception.is_a?(Pundit::Error)
       Rails.logger.error "Pundit error not caught by specific handler: #{exception.class}"
       return handle_unauthorized(exception) if exception.is_a?(Pundit::NotAuthorizedError)

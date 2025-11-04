@@ -26,13 +26,12 @@ class DataExportJob
       end
       
       csv_data = generate_csv(tasks)
-      
       TaskMailer.data_export(user, csv_data).deliver_now
       Rails.logger.info "DataExportJob: Export sent successfully for user #{user_id}"
     rescue StandardError => e
       Rails.logger.error "DataExportJob failed for user #{user_id}: #{e.class} - #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
-      raise
+      raise # Re-raise to trigger Sidekiq retry
     end
   end
 

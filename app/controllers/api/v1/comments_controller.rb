@@ -40,7 +40,7 @@ class Api::V1::CommentsController < Api::BaseController
 
   def destroy
     return unless @task && @comment
-    # For simplicity, allow comment deletion if user owns the comment or task
+
     if @comment.user_id == current_user.id || @task.creator_id == current_user.id || current_user.admin?
       @comment.destroy
       render json: { message: I18n.t('comments.deleted_successfully') }, status: :ok
@@ -73,9 +73,7 @@ class Api::V1::CommentsController < Api::BaseController
         details: { parameter: 'id' }
       )
     end
-    
-    # For destroy action (shallow route), find comment directly and get task from it
-    # For other actions, find comment through task
+
     if @task
       @comment = @task.comments.find_by(id: params[:id])
     else

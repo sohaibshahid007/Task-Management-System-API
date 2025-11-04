@@ -68,6 +68,9 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
+  # Email preview in browser (development only)
+  gem "letter_opener"
+
   # Testing
   gem "rspec-rails"
   gem "factory_bot_rails"
